@@ -1,6 +1,6 @@
 import Axios from "axios";
 import { AsyncStorage } from "react-native";
-
+import { API_HOST } from "react-native-dotenv";
 const LOGIN = "LOGIN";
 const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 const LOGIN_FAILURE = "LOGIN_FAULURE";
@@ -11,7 +11,7 @@ export const loginFailure = () => ({ type: LOGIN_FAILURE });
 
 const initialState = {
   status: "init",
-  tokne: null,
+  token: null,
 };
 
 export default (state = initialState, action) => {
@@ -40,26 +40,27 @@ export default (state = initialState, action) => {
 export function loginRequest(accountId, password) {
   return (dispatch) => {
     dispatch(login());
-    Axios.post("http://61.97.187.57:3000/user/login", {
+    Axios.post(`${API_HOST}/user/login`, {
       accountId,
       password,
-    }).then((res) => {
-      dispatch(loginSuccess(res.data.token));
-      const saveToken = async (token) => {
-        await AsyncStorage.setItem("token", token);
-      };
-      saveToken(res.data.token);
-    });
+    })
+      .then((res) => {
+        dispatch(loginSuccess(res.data.token));
+        const saveToken = async (token) => {
+          await AsyncStorage.setItem("token", token);
+        };
+        saveToken(res.data.token);
+      })
   };
 }
 export function logoutRequest() {
-    return (dispatch) => {
-        const removeToken = async () => {
-            await AsyncStorage.removeItem('token')
-          };
-          removeToken();
-          dispatch(login())
-    }
+  return (dispatch) => {
+    const removeToken = async () => {
+      await AsyncStorage.removeItem("token");
+    };
+    removeToken();
+    dispatch(login());
+  };
 }
 export function AutoLoginRequest(token) {
   return (dispatch) => {

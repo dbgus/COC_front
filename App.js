@@ -1,5 +1,5 @@
-import React, {useEffect, useState}from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, Button } from "react-native";
 import { createStore, applyMiddleware } from "redux";
 
 import { NavigationContainer } from "@react-navigation/native";
@@ -21,25 +21,13 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="auth"
-          // screenOptions={{
-          //   headerBackground: () => (
-
-          //   ),
-          // }}
+          headerMode="false"
+          screenOptions={{
+            headerTintColor: "white",
+            headerStyle: { backgroundColor: "tomato" },
+          }}
         >
-          <Stack.Screen
-            name="map"
-            component={MapContainer}
-            options={{
-              headerRight: () => (
-                <Button
-                  onPress={() => alert("This is a button!")}
-                  title="Info"
-                  color="#00cc00"
-                />
-              ),
-            }}
-          />
+          <Stack.Screen name="map" component={MapContainer} />
           <Stack.Screen name="auth" component={AUthContainer} />
           <Stack.Screen name="give" component={GiveContainer} />
         </Stack.Navigator>
@@ -49,4 +37,3 @@ const App = () => {
 };
 
 export default App;
-

@@ -9,7 +9,7 @@ import {
   logoutRequest,
 } from "../../reducer/Reducer/Auth";
 
-const Auth = () => {
+const Auth = ({ navigation }) => {
   const dispatch = useDispatch();
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
@@ -19,6 +19,7 @@ const Auth = () => {
     const getToken = async () => {
       if (await AsyncStorage.getItem("token")) {
         dispatch(AutoLoginRequest(token));
+        navigation.navigate("map");
       }
     };
     getToken();
@@ -54,5 +55,6 @@ const styles = StyleSheet.create({
   input: {
     height: 30,
     borderWidth: 1,
+    flex: 1,
   },
 });
