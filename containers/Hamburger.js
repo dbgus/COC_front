@@ -1,14 +1,17 @@
 import React from "react";
 import { Icon, Header } from "native-base";
 import { StyleSheet, Text, View, Dimensions } from "react-native";
+import {  DrawerActions } from "@react-navigation/native";
+import { useNavigation } from '@react-navigation/native';
 
 const Hamburger = () => {
+   const navigation = useNavigation();;
   return (
     <View style={styles.container}>
       <Icon
         style={styles.Hamburger}
         name="menu"
-        // onPress={(navigation) => navigation.navigate("MyModal")}
+        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
       />
     </View>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { View, Text, StyleSheet, Dimensions, Button } from "react-native";
 import MapView, { Polyline, Marker } from "react-native-maps";
 import { AsyncStorage } from "react-native";
@@ -9,8 +9,11 @@ import {
   postMyLoactionRequest,
 } from "../../reducer/Reducer/Location";
 import Hamburger from "../Hamburger";
+
 const MapContainer = () => {
   const dispatch = useDispatch();
+  const [once, setOnce] = useState(false);
+
   useEffect(() => {
     const _GPSPermisson = async () => {
       try {
@@ -29,21 +32,27 @@ const MapContainer = () => {
           longitude: loc.coords.longitude,
           token,
         };
-        dispatch(saveMyLoactionReqeust(data));
-        // dispatch(postMyLoactionRequest(data));
+        if (!once) {
+          dispatch(postMyLoactionRequest(data));
+          setOnce(true);
+        }
+        // console.log(loc.coords.speed)
+        if (loc.coords.speed !== -1) {
+          dispatch(postMyLoactionRequest(data));
+        }
       } catch {
-        console.log("failed");
+        // console.log("failed");
       }
     };
 
     const currentLocRequest = setInterval(() => {
       getLocation();
-    }, 5000);
+    }, 2000);
     return () => clearInterval(currentLocRequest);
   }, []);
-  const lata = useSelector((state) => state.Location.currentLoc);
-  // console.log(lata);
-  // console.log(lat, lng);
+  const lata = useSelector((state) => state.Location.location.currentLoc);
+  const polyLine = useSelector((state) => state.Location.location.polyLine);
+
   return (
     <View style={styles.container}>
       <Hamburger />
@@ -62,24 +71,21 @@ const MapContainer = () => {
             title="this is a marker"
             description="this is a marker example"
           />
-          <Polyline
-            coordinates={[
-              { latitude: 37.483344119596154, longitude: 126.9792060723688 },
-              { latitude: 37.74114790433078, longitude: 126.7770242067987 },
-              { latitude: 37.74114790433078, longitude: 126.8770242067987 },
-              { latitude: 37.74114790433078, longitude: 126.9770242067987 },
-            ]}
-            strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-            strokeColors={[
-              "#7F0000",
-              "#00000000", // no color, creates a "long" gradient between the previous and next coordinate
-              "#B24112",
-              "#E5845C",
-              "#238C23",
-              "#7F0000",
-            ]}
-            strokeWidth={2}
-          />
+          {/* my polyline */}
+          {polyLine.length > 0 ? (
+            <Polyline
+              coordinates={
+                [...polyLine]
+                // { latitude: 37.483344119596154, longitude: 126.9792060723688 },
+                // { latitude: 37.74114790433078, longitude: 126.7770242067987 },
+                // { latitude: 37.74114790433078, longitude: 126.8770242067987 },
+                // { latitude: 37.74114790433078, longitude: 126.9770242067987 },
+              }
+              strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+              strokeColors={["green"]}
+              strokeWidth={2}
+            />
+          ) : null}
         </MapView>
       ) : (
         <Text>loading</Text>

@@ -11,13 +11,13 @@ export const postMyLocationFailure = () => ({ type: POST_MY_LOCATION_FAILURE });
 export const saveMyLoaction = (data) => ({ type: SAVE_MY_LOCATION, data });
 
 const initialState = {
-  location: {
+  
+  location : {
     status: "init",
-    currentLoc: {
-      latitude: 1,
-      longitude: 1,
-    },
-  },
+    currentLoc: null,
+    polyLine: [],
+  }
+  
 };
 
 export default (state = initialState, action) => {
@@ -36,25 +36,36 @@ export default (state = initialState, action) => {
         ...state,
       };
     case SAVE_MY_LOCATION:
+      const line = state.location.polyLine
+      line.push({latitude: action.data.latitude, longitude: action.data.longitude})
+      
+      // console.log(line)
+      // console.log(state.polyLine.push({latitude: action.data.latitude, longitude: action.data.longitude}))
+      // console.log(line)
       return {
         ...state,
-        currentLoc: action.data,
+        location : {
+          currentLoc: action.data,
+          polyLine: line
+        }
       };
     default:
       return state;
   }
 };
 export const postMyLoactionRequest = (data) => (dispatch) => {
-  dispatch(postMyLocation());
-  Axios.post(`${API_HOST}/location`, data)
-    .then((res) => {
-      dispatch(postMyLocationSuccess());
-    })
-    .catch(() => {
-      dispatch(postMyLocationFailure());
-    });
+  // dispatch(postMyLocation());
+  // const config = {
+  //   headers: { 'Content-type': 'application/json', token: data.token },
+  // }
+  dispatch(saveMyLoaction(data));
+
+  // Axios.post(`${API_HOST}/location`, data, config)
+  //   .then((res) => {
+  //     dispatch(postMyLocationSuccess());
+  //   })
+  //   .catch((e) => {
+  //     dispatch(postMyLocationFailure());
+  //   });
 };
 
-export const saveMyLoactionReqeust = (data) => (dispatch) => {
-  dispatch(saveMyLoaction(data));
-};
