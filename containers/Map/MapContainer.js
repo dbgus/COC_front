@@ -7,8 +7,10 @@ import * as Location from "expo-location";
 import {
   saveMyLoactionReqeust,
   postMyLoactionRequest,
+  getConfirmerRequest,
 } from "../../reducer/Reducer/Location";
 import Hamburger from "../Hamburger";
+import MyLocationBTN from "./MylocationBTN";
 
 const MapContainer = () => {
   const dispatch = useDispatch();
@@ -22,40 +24,61 @@ const MapContainer = () => {
     };
     _GPSPermisson();
   }, []);
+  // const pushToken = useSelector((state) => state.Auth.pushToken);
+
   useEffect(() => {
     const getLocation = async () => {
       try {
-        const loc = await Location.getCurrentPositionAsync();
+        const option = {
+          accuracy: 6,
+        };
+        const loc = await Location.getCurrentPositionAsync(option);
         const token = await AsyncStorage.getItem("token");
+
         const data = {
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
           token,
         };
-        if (!once) {
-          dispatch(postMyLoactionRequest(data));
-          setOnce(true);
-        }
-        // console.log(loc.coords.speed)
-        if (loc.coords.speed !== -1) {
-          dispatch(postMyLoactionRequest(data));
-        }
+        dispatch(postMyLoactionRequest(data));
       } catch {
-        // console.log("failed");
+        console.log("failed");
       }
     };
-
+    const getConfirmer = async () => {
+      const loc = await Location.getCurrentPositionAsync();
+      const token = await AsyncStorage.getItem("token");
+      const pushToken = await AsyncStorage.getItem("pushToken");
+      try {
+        const data = {
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+          token,
+          pushToken,
+        };
+        dispatch(getConfirmerRequest(data));
+      } catch {
+        console.log("fail");
+      }
+    };
     const currentLocRequest = setInterval(() => {
       getLocation();
-    }, 2000);
-    return () => clearInterval(currentLocRequest);
+    }, 3000);
+    const getConfirmerInterval = setInterval(() => {
+      getConfirmer();
+    }, 3000);
+    return () => {
+      clearInterval(currentLocRequest);
+      clearInterval(getConfirmerInterval);
+    };
   }, []);
   const lata = useSelector((state) => state.Location.location.currentLoc);
   const polyLine = useSelector((state) => state.Location.location.polyLine);
-
+  const confirmer = useSelector((state) => state.Location.location.confirmer);
   return (
     <View style={styles.container}>
       <Hamburger />
+      <MyLocationBTN style={styles.location} />
       {lata ? (
         <MapView
           style={styles.map}
@@ -86,6 +109,64 @@ const MapContainer = () => {
               strokeWidth={2}
             />
           ) : null}
+          <Polyline
+            coordinates={[
+              {
+                latitude: 37.484315,
+                longitude: 126.977035,
+              },
+              {
+                latitude: 37.485111,
+                longitude: 126.978033,
+              },
+              {
+                latitude: 37.484971,
+                longitude: 126.978891,
+              },
+              {
+                latitude: 37.484971,
+                longitude: 126.978891,
+              },
+              {
+                latitude: 37.484391,
+                longitude: 126.97918,
+              },
+              {
+                latitude: 37.484272,
+                longitude: 126.979534,
+              },
+              {
+                latitude: 37.484149,
+                longitude: 126.980559,
+              },
+            ]}
+            strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+            strokeColors={["red"]}
+            strokeWidth={5}
+          />
+          <Polyline
+            coordinates={[
+              {
+                latitude: 37.482831,
+                longitude: 126.978775,
+              },
+              {
+                latitude: 37.482784,
+                longitude: 126.980508,
+              },
+              {
+                latitude: 37.482744,
+                longitude: 126.981813,
+              },
+              {
+                latitude: 37.48034,
+                longitude: 126.981724,
+              },
+            ]}
+            strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+            strokeColors={["red"]}
+            strokeWidth={5}
+          />
         </MapView>
       ) : (
         <Text>loading</Text>
@@ -108,5 +189,8 @@ const styles = StyleSheet.create({
     flex: 1,
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
+  },
+  location: {
+    zIndex: 100,
   },
 });

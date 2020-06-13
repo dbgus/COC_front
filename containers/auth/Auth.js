@@ -18,8 +18,8 @@ const Auth = ({ navigation }) => {
   useEffect(() => {
     const getToken = async () => {
       if (await AsyncStorage.getItem("token")) {
-        // dispatch(AutoLoginRequest(token));
-        // navigation.navigate("map");
+        dispatch(AutoLoginRequest(token));
+        navigation.navigate("map");
       }
     };
     getToken();
@@ -52,8 +52,8 @@ const Auth = ({ navigation }) => {
         </View>
       </View>
 
-      <Button title="로그인" onPress={() => dispatch(loginRequest(id, pw))} />
-      <Button title="로그아웃" onPress={() => dispatch(logoutRequest())} />
+      <Text style={styles.BTN} title="Login" onPress={() => dispatch(loginRequest(id, pw))} >Login</Text>
+      <Text style={styles.BTN} title="Created new account" onPress={() => dispatch(logoutRequest())}>Create new Account</Text>
     </View>
   );
 };
@@ -64,10 +64,11 @@ const styles = StyleSheet.create({
   input: {
     height: 30,
     marginBottom: 30,
+    marginLeft: 35,
     width: 200,
     alignSelf: "center",
     borderWidth: 2,
-    borderRadius: 10,
+    borderRadius: 12,
   },
   container: {
     flex: 1,
@@ -78,13 +79,13 @@ const styles = StyleSheet.create({
   },
   label: {
     position: "absolute",
-    marginLeft: 42,
+    marginLeft: 65,
     fontSize: 23,
     fontWeight: "bold",
   },
   label1: {
     position: "absolute",
-    marginLeft: 52,
+    marginLeft: 75,
     fontSize: 23,
     fontWeight: "bold",
   },
@@ -93,4 +94,17 @@ const styles = StyleSheet.create({
     height: 350,
     marginTop: -100,
   },
+  BTN: {
+    width: '50%',
+    backgroundColor: '#000000',
+    margin: 10,
+    fontSize: 15,
+    color: 'white',
+    alignSelf: "center",
+    textAlign: "center",
+    fontWeight: '800',
+    borderWidth: 2,
+    borderRadius: 10,
+    overflow: 'hidden'
+  }
 });
